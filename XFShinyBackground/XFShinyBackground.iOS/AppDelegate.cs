@@ -22,6 +22,8 @@ namespace XFShinyBackground.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
+            Shiny.iOSShinyHost.Init(new MyStartup());
+
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
 
