@@ -4,6 +4,8 @@ using Shiny.Locations;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using XFShinyBackground.Services;
+using static XFShinyBackground.Services.GpsListener;
 
 namespace XFShinyBackground
 {
@@ -13,6 +15,8 @@ namespace XFShinyBackground
         {
             services.UseGeofencing<MyGeofenceDelegate>(true);
             services.UseNotifications(true);
+            services.UseGps<LocationDelegate>();
+            services.AddSingleton<IGpsListener, GpsListener>();
         }
     }
 }

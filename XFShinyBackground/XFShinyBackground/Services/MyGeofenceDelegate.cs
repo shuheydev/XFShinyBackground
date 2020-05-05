@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace XFShinyBackground
 {
-    public class MyGeofenceDelegate : IGeofenceDelegate,IGpsDelegate
+    public class MyGeofenceDelegate : IGeofenceDelegate
     {
         private readonly INotificationManager _notifications;
 
@@ -16,12 +16,7 @@ namespace XFShinyBackground
         public MyGeofenceDelegate(INotificationManager notifications)
         {
             this._notifications = notifications;
-        }
-
-        public Task OnReading(IGpsReading reading)
-        {
-            return null;
-        }
+        }     
 
         public async Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
         {

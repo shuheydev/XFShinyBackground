@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="XFShinyBackground.MainPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Visual="Material"
+    mc:Ignorable="d">
+
+    <StackLayout>
+        <!--  Place new controls here  -->
+        <Button Command="{Binding Register}" Text="Geofence Register" />
+        <Button Command="{Binding Notify}" Text="Notify" />
+        <Button Command="{Binding StartGPS}" Text="Start GPS" />
+        <Button Command="{Binding StopGPS}" Text="Stop GPS" />
+        <Label x:Name="locationLabel" Text="{Binding LocationMessage}" />
+        <Button Command="{Binding GetOnceGPS}" Text="Get gps once" />
+    </StackLayout>
+
+</ContentPage>
