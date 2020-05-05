@@ -4,6 +4,7 @@ using Shiny.Notifications;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -25,23 +26,54 @@ namespace XFShinyBackground
             var gpsListener = ShinyHost.Resolve<IGpsListener>();
             //gpsListener.OnReadingReceived += OnReadingReceived;
 
-            Register = new Command(async () =>
+            var backgroundJob = ShinyHost.Resolve<Shiny.Jobs.IJobManager>();
+
+            StartGeofence = new Command(async () =>
             {
                 // this is really only required on iOS, but do it to be safe
                 var access = await notifications.RequestAccess();
                 if (access == AccessState.Available)
                 {
                     await geofences.StartMonitoring(new GeofenceRegion(
-                        "CN Tower - Toronto, Canada",
-                        new Position(35.7816473, 139.6182211),
+                        "My Home",
+                        new Position(35.783403605517925, 139.61851208723849),
                         Distance.FromMeters(200)
                     )
                     {
                         NotifyOnEntry = true,
                         NotifyOnExit = true,
-                        SingleUse = false
+                        SingleUse = true,
+                    });
+                    //35.7839938,139.6150627
+                    await geofences.StartMonitoring(new GeofenceRegion(
+                        "Park",
+                        new Position(35.7839938, 139.6150627),
+                        Distance.FromMeters(200))
+                    {
+                        NotifyOnEntry = true,
+                        NotifyOnExit = true,
+                        SingleUse = true,
+                    });
+
+                    await notifications.Send(new Notification
+                    {
+                        Title = "Geo fencing started",
+                        Message = $"{DateTimeOffset.Now}",
                     });
                 }
+            });
+            StopGeofence = new Command(async () =>
+            {
+                if (!(await geofences.GetMonitorRegions()).Any())
+                    return;
+
+                await geofences.StopAllMonitoring();
+
+                await notifications.Send(new Notification
+                {
+                    Title = "Geo fencing stopped",
+                    Message = $"{DateTimeOffset.Now}",
+                });
             });
 
             Notify = new Command(async () =>
@@ -53,20 +85,22 @@ namespace XFShinyBackground
                 });
             });
 
+            IDisposable rx = null;
             StartGPS = new Command(async () =>
             {
                 if (gpsManager.IsListening)
                     return;
 
+                rx?.Dispose();
                 //Rxを利用した例.
-                gpsManager
+                rx = gpsManager
                     .WhenReading()
-                    .Subscribe(x =>
+                    .Subscribe(async x =>
                     {
                         this.LocationMessage = $"{x.Position.Latitude}, {x.Position.Longitude}";
-                        notifications.Send(new Notification
+                        await notifications.Send(new Notification
                         {
-                            Title = $"gps {DateTimeOffset.Now}",
+                            Title = $"gps periodic {DateTimeOffset.Now}",
                             Message = $" {this.LocationMessage}"
                         });
                     });
@@ -82,26 +116,28 @@ namespace XFShinyBackground
             StopGPS = new Command(async () =>
             {
                 await gpsManager.StopListener();
+
                 LocationMessage = "Stopped";
             });
-
-            GetOnceGPS = new Command(async () => {
+            
+            GetOnceGPS = new Command(async () =>
+            {
                 if (gpsManager.IsListening)
                     return;
-
-                gpsManager
-                .WhenReading()
-                .Take(1)
-                .Subscribe(async x =>
-                {
-                    this.LocationMessage = $"{x.Position.Latitude}, {x.Position.Longitude}";
-                    await notifications.Send(new Notification
+                rx?.Dispose();
+                rx = gpsManager
+                    .WhenReading()
+                    .Take(1)
+                    .Subscribe(async x =>
                     {
-                        Title = $"gps {DateTimeOffset.Now}",
-                        Message = $" {this.LocationMessage}"
+                        this.LocationMessage = $"{x.Position.Latitude}, {x.Position.Longitude}";
+                        await notifications.Send(new Notification
+                        {
+                            Title = $"gps {DateTimeOffset.Now}",
+                            Message = $" {this.LocationMessage}"
+                        });
+                        await gpsManager.StopListener();
                     });
-                    await gpsManager.StopListener();
-                });
 
                 var request = new GpsRequest
                 {
@@ -122,7 +158,8 @@ namespace XFShinyBackground
             //Debug.WriteLine(LocationMessage);
         }
 
-        public ICommand Register { get; }
+        public ICommand StartGeofence { get; }
+        public ICommand StopGeofence { get; }
         public ICommand Notify { get; }
         public ICommand StartGPS { get; }
         public ICommand StopGPS { get; }

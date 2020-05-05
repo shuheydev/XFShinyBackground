@@ -10,7 +10,8 @@
 
     <StackLayout>
         <!--  Place new controls here  -->
-        <Button Command="{Binding Register}" Text="Geofence Register" />
+        <Button Command="{Binding StartGeofence}" Text="Start Geofence" />
+        <Button Command="{Binding StopGeofence}" Text="Stop Geofence" />
         <Button Command="{Binding Notify}" Text="Notify" />
         <Button Command="{Binding StartGPS}" Text="Start GPS" />
         <Button Command="{Binding StopGPS}" Text="Stop GPS" />
