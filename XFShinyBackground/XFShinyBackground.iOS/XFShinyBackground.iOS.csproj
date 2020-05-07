@@ -124,13 +124,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Shiny.Core">
-      <Version>1.1.0.1473</Version>
+      <Version>1.1.0.1570</Version>
     </PackageReference>
     <PackageReference Include="Shiny.Locations">
-      <Version>1.1.0.1473</Version>
+      <Version>1.1.0.1570</Version>
     </PackageReference>
     <PackageReference Include="Shiny.Notifications">
-      <Version>1.1.0.1473</Version>
+      <Version>1.1.0.1570</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.1" />
