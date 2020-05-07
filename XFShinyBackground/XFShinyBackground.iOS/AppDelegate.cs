@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Foundation;
+using Shiny;
 using UIKit;
 
 namespace XFShinyBackground.iOS
@@ -22,12 +23,27 @@ namespace XFShinyBackground.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            Shiny.iOSShinyHost.Init(new MyStartup());
+            //Shiny.iOSShinyHost.Init(new MyStartup());
+            this.ShinyFinishedLaunching(new MyStartup());
 
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);
+        }
+
+        public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            base.PerformFetch(application, completionHandler);
+
+            this.ShinyPerformFetch(completionHandler);
+        }
+
+        public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, [BlockProxy(typeof(NIDAction))] Action completionHandler)
+        {
+            base.HandleEventsForBackgroundUrl(application, sessionIdentifier, completionHandler);
+
+            this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
         }
     }
 }
